@@ -1,12 +1,20 @@
-name: "Profilarr"
-description: "Configuration management tool for Radarr/Sonarr that automates importing and version control of custom formats and quality profiles."
-version: "1.0.1"
-slug: "profilarr"
-init: false
+# https://developers.home-assistant.io/docs/add-ons/configuration#add-on-config
+name: Example add-on
+version: "1.2.0"
+slug: example
+description: Example add-on
+url: "https://github.com/home-assistant/addons-example/tree/main/example"
 arch:
+  - armhf
+  - armv7
+  - aarch64
   - amd64
-url: "https://dictionarry.dev/"
-ports:
-  6868/tcp: 6868
-image: santiagosayshey/profilarr:v1.0.1
-webui: http://[HOST]:[PORT:6868]/
+  - i386
+init: false
+map:
+  - share:rw
+options:
+  message: "Hello world..."
+schema:
+  message: "str?"
+image: "ghcr.io/home-assistant/{arch}-addon-example"
