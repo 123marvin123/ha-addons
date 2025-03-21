@@ -16,4 +16,5 @@
 #bashio::log.info "${message:="Hello World..."}"
 
 ## Run your program
+cd /usr/bin/profilarr || exit 1
 exec gunicorn --bind 0.0.0.0:6868 --timeout 600 "app.main:create_app()"

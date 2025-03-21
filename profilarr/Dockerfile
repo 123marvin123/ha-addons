@@ -1,4 +1,8 @@
-FROM node:18-bullseye as builder
+ARG PROFILARR_VERSION=1.0.1
+ARG BUILD_FROM
+ARG BUILD_ARCH
+
+FROM node:18-bullseye AS builder
 
 ARG PROFILARR_VERSION
 ARG BUILD_FROM
@@ -20,25 +24,32 @@ RUN cd .. && \
     cp -r backend/* dist/backend/ && \
     cp backend/requirements.txt dist/
 
-FROM $BUILD_FROM
+FROM ${BUILD_FROM}
 
 ARG PROFILARR_VERSION
+ARG BUILD_FROM
 ARG BUILD_ARCH
 
 RUN echo "Profilarr version: ${PROFILARR_VERSION}" && \
     echo "Build architecture: ${BUILD_ARCH}"
 
 # Install dependencies
-RUN apt-get update && apt-get install -y python3 python3-pip && \
-    pip3 install --no-cache-dir -r /dist/requirements.txt && \
-    apt-get remove -y python3-pip && apt-get autoremove -y
+RUN apk update && \
+    apk add --no-cache git python3 tzdata py3-six py3-requests py3-pip gcc python3-dev musl-dev
 
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /usr/bin/app
+WORKDIR /usr/bin/profilarr
 
 # Copy Profilarr
-COPY --from=builder /profilarr-${PROFILARR_VERSION}/dist .
+COPY --from=builder /profilarr-${PROFILARR_VERSION}/dist/backend/app ./app
+COPY --from=builder /profilarr-${PROFILARR_VERSION}/dist/static ./app/static
+COPY --from=builder /profilarr-${PROFILARR_VERSION}/dist/requirements.txt .
+
+RUN pip3 install "cython<3.0.0" && \
+    pip3 install wheel && \
+    pip3 install --no-build-isolation "pyyaml==5.4.1"
+
+RUN pip3 install --no-cache-dir -r requirements.txt && \
+    apk del py3-pip gcc python3-dev musl-dev
 
 # Copy root filesystem
 COPY rootfs /
