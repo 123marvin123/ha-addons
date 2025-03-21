@@ -1,6 +1,6 @@
 name: Profilarr
 version: "1.0.1"
-slug: example
+slug: profilarr
 description: Configuration management tool for Radarr/Sonarr that automates importing and version control of custom formats and quality profiles.
 url: "https://dictionarry.dev/"
 arch:
