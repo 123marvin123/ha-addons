@@ -1,6 +1,12 @@
 FROM node:18-bullseye as builder
 
 ARG PROFILARR_VERSION
+ARG BUILD_FROM
+ARG BUILD_ARCH
+
+RUN echo "Profilarr version: ${PROFILARR_VERSION}" && \
+    echo "Build architecture: ${BUILD_ARCH}" && \
+    echo "Build from: ${BUILD_FROM}"
 
 RUN apt-get update && apt-get install -y wget tar
 RUN wget https://github.com/Dictionarry-Hub/profilarr/archive/refs/tags/v${PROFILARR_VERSION}.tar.gz
@@ -14,18 +20,20 @@ RUN cd .. && \
     cp -r backend/* dist/backend/ && \
     cp backend/requirements.txt dist/
 
-ARG BUILD_FROM
 FROM $BUILD_FROM
 
-# Execute during the build of the image
-ARG PROFILARR_VERSION BUILD_ARCH
-RUN echo "Profilar version: ${PROFILARR_VERSION}" && \
+ARG PROFILARR_VERSION
+ARG BUILD_ARCH
+
+RUN echo "Profilarr version: ${PROFILARR_VERSION}" && \
     echo "Build architecture: ${BUILD_ARCH}"
 
 # Install dependencies
 RUN apt-get update && apt-get install -y python3 python3-pip && \
     pip3 install --no-cache-dir -r /dist/requirements.txt && \
     apt-get remove -y python3-pip && apt-get autoremove -y
+
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/bin/app
 
